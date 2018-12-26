@@ -1,0 +1,2 @@
+# xsdaiviet
+store static xsdaiviet
