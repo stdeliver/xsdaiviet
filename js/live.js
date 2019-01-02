@@ -30,6 +30,48 @@ function dateNow(){
     return today;
 }
 
+function loadConfig(){
+    var config = {
+       apiKey: "AIzaSyDqy31SKVWYp4Duu4IH4qIullwq2Odb7es",
+       authDomain: "mascom-865bf.firebaseio.com",
+       databaseURL: "https://mascom-865bf.firebaseio.com",
+       projectId: "mascom-865bf",
+       storageBucket: "",
+       messagingSenderId: "827774519905"
+   };
+   firebase.initializeApp(config);
+}
+
+function loadKQLiveCompany(db){   
+   var messagesRef=firebase.database().ref('messages/'+db);
+   messagesRef.limitToLast(1).on('child_added', setMessageCompany);
+   messagesRef.limitToLast(1).on('child_changed', setMessageCompany);
+}
+
+function setMessageCompany(data){
+//    console.log(data.val().text);
+   try {
+       var messages=JSON.parse(data.val().text);
+       var today=dateNow();
+       console.log(messages);
+       if(messages[38].message===today){
+           for(var i=0;i<messages.length;i++){
+               var item=messages[i];
+               // console.log(item);
+               var id='#'+item.id;
+               if(item.message!==''){
+                   console.log("id==="+item.id+"...meg=="+item.message);
+                   $(id).html(item.message);    
+               }
+           }
+       }
+   } catch (e) {
+       console.log('setMessage');
+   }
+
+   
+}
+
 function loadKQLive(){
     
     var config = {
@@ -95,11 +137,15 @@ function loadLiveRegion(region,code){
         liveKQXS('MB',code);
     }else if (region==='MT'&&currTime > 171000 && currTime < 174500) {
         if(!liveMT){liveKQXS('MT',code);}
-        else{liveKQXS_V2('MT');}
+        else{
+            // liveKQXS_V2('MT');
+        }
         liveMT=true;
     }else if (region==='MN'&&currTime > 161000 && currTime < 164500) {
         if(!liveMN){liveKQXS('MN',code);}
-        else{liveKQXS_V2('MN');}
+        else{
+            // liveKQXS_V2('MN');
+        }
         liveMN=true;
     }
     
@@ -113,11 +159,15 @@ function loadLive(){
         liveKQXS('MB','full');
     }else if (currTime > 171000 && currTime < 174500) {
         if(!liveMT){liveKQXS('MT','full');}
-        else{liveKQXS_V2('MT');}
+        else{
+            // liveKQXS_V2('MT');
+        }
         liveMT=true;
     }else if (currTime > 161000 && currTime < 164500) {
         if(!liveMN){liveKQXS('MN','full');}
-        else{liveKQXS_V2('MN');}
+        else{
+            // liveKQXS_V2('MN');
+        }
         liveMN=true;
     }
     
@@ -145,7 +195,35 @@ function liveKQXS(region,code){
 //            console.log(response);
             $('#kqxs').html(response);
             if(region==='MB'){loadKQLive();}
-            else{liveKQXS_V2(region);}
+            else{
+                // liveKQXS_V2(region);
+                //lay ket qua tu firebase
+                loadConfig();
+                if(region==='MN'){
+                    if(code==='full'){
+                        arrCompMN=arrCompMN.split(',');
+                        for (var i in arrCompMN) {
+                            if(arrCompMN[i]!==''){
+                                loadKQLiveCompany(arrCompMN[i]);
+                            }
+                        }
+                    }else{
+                        loadKQLiveCompany(code.toUpperCase());
+                    }
+                }else if(region==='MT'){
+                    if(code==='full'){
+                        arrCompMT=arrCompMT.split(',');
+                        for (var i in arrCompMT) {
+                            if(arrCompMT[i]!==''){
+                                loadKQLiveCompany(arrCompMT[i]);
+                            }
+                        }
+                    }else{
+                        loadKQLiveCompany(code.toUpperCase());
+                    }
+                }
+                //ket thuc
+            }
         });
     } catch (e) {
         console.log(e);
