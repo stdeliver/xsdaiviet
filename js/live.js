@@ -132,16 +132,19 @@ function countDownLiveRegion(region,code){
 function loadLiveRegion(region,code){
     var currTime = getCurrHHMMSS();
     console.log(currTime);
-    if (region==='MB'&&currTime > 181000 && currTime < 184500 && !liveMB) {
+    if (region==='MB'&&currTime > 181000  && !liveMB) {
+        //&& currTime < 184500
         liveMB=true;
         liveKQXS('MB',code);
-    }else if (region==='MT'&&currTime > 171000 && currTime < 174500) {
+    }else if (region==='MT'&&currTime > 171000 ) {
+        //&& currTime < 174500
         if(!liveMT){liveKQXS('MT',code);}
         else{
             // liveKQXS_V2('MT');
         }
         liveMT=true;
-    }else if (region==='MN'&&currTime > 161000 && currTime < 164500) {
+    }else if (region==='MN'&&currTime > 161000 ) {
+        //&& currTime < 164500
         if(!liveMN){liveKQXS('MN',code);}
         else{
             // liveKQXS_V2('MN');
@@ -199,6 +202,51 @@ function liveKQXS(region,code){
                 // liveKQXS_V2(region);
                 //lay ket qua tu firebase
                 loadConfig();
+                if(region==='MN'){
+                    if(code==='full'){
+                        arrCompMN=arrCompMN.split(',');
+                        for (var i in arrCompMN) {
+                            if(arrCompMN[i]!==''){
+                                loadKQLiveCompany(arrCompMN[i]);
+                            }
+                        }
+                    }else{
+                        loadKQLiveCompany(code.toUpperCase());
+                    }
+                }else if(region==='MT'){
+                    if(code==='full'){
+                        arrCompMT=arrCompMT.split(',');
+                        for (var i in arrCompMT) {
+                            if(arrCompMT[i]!==''){
+                                loadKQLiveCompany(arrCompMT[i]);
+                            }
+                        }
+                    }else{
+                        loadKQLiveCompany(code.toUpperCase());
+                    }
+                }
+                //ket thuc
+            }
+        });
+    } catch (e) {
+        console.log(e);
+    }
+
+    
+}
+
+function liveKQXSNew(region,code,id){
+    try {
+        $.ajax({
+        url:'ajax/live.htm?r='+region+'&c='+code
+        }).done(function (response) {
+//            console.log(response);
+            $('#'+id).html(response);
+            if(region==='MB'){loadKQLive();}
+            else{
+                // liveKQXS_V2(region);
+                //lay ket qua tu firebase
+//                loadConfig();
                 if(region==='MN'){
                     if(code==='full'){
                         arrCompMN=arrCompMN.split(',');
